@@ -66,7 +66,7 @@ export default function Exercise01 () {
 
   return (
     <section className="exercise01">
-      <div className="movies__list">
+      <div className='movies__list'>
         <ul>
           {movies.map(o => (
             <li className="movies__list-card">
