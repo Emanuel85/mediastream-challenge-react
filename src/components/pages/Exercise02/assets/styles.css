@@ -1,26 +1,63 @@
 .movie-library {
-  background-color: var(--black);
+  background-image: url("./mountains.jpg");
+  background-color: #222222;
   color: var(--white);
+  position: relative;
+  background-size: contain;
+  background-position-y: -230px;
+  background-repeat: no-repeat;
   min-height: 100vh;
   padding: 2em;
 }
 
+.movie-library::after {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(to bottom, transparent 0%, #222222 4%);
+}
+
+
 .movie-library__title {
+  position: relative;
   font-size: 2em;
   margin-bottom: 1em;
+  z-index: 9;
 }
 
 .movie-library__actions {
   display: flex;
-  margin-bottom: 1em;
+  width: 96%;
+  height: 40px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
 }
 
 .movie-library__actions select {
+  font-weight: 400;
+  font-size: 18px;
+  border-radius: 5px 0 0 5px;
+  border: 2px solid #97d700;
   width: 100%;
-  padding: .25em;
+  padding: 0.25em;
 }
 
 .movie-library__actions button {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  font-size: 17px;
+  background-color: #97d700;
+  border: none;
+  width: 180px;
+  border-radius: 0 5px 5px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   white-space: nowrap;
 }
 
@@ -33,19 +70,45 @@
 }
 
 .movie-library__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  justify-content: center;
+  grid-gap: 1rem;
   padding: 1em;
-  background-color: #222222;
+
 }
 
 .movie-library__card {
-  background-color: #333333;
-  margin-bottom: 1em;
+  position: relative;
+  margin: 1rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  border-radius: 15px;
+  height: 650px;
 }
 
 .movie-library__card img {
-  width: 10em;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  border-radius: 15px;
+  z-index: 1;
+}
+
+.movie-library__card::after {
+  z-index: 2;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(to bottom, transparent 50%, #97d700 100%);
+  border-radius: 15px;
 }
 
 .movie-library__card ul {
@@ -53,5 +116,15 @@
 }
 
 .movie-library__card li {
-  line-height: 120%;
+  z-index: 3;
+  margin-left: 15px;
+}
+
+.movie-library__card li:nth-child(1) {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.movie-library__card li:nth-child(3) {
+  margin-bottom: 15px;
 }

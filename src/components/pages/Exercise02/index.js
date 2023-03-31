@@ -13,31 +13,80 @@
  */
 
 import "./assets/styles.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import imgMovieNotAvailable from './assets/movieNotAvailable.jpg'
 
-export default function Exercise02 () {
+export default function Exercise02() {
   const [movies, setMovies] = useState([])
+  const [genres, setGenres] = useState([])
+  const [selectedGenre, setSelectedGenre] = useState('')
   const [fetchCount, setFetchCount] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [ascendingOrder, setAscendingOrder] = useState(true)
+
+  const orderedMovies = useMemo(() => {
+    let filteredMovies = movies
+    if (selectedGenre !== '') {
+      filteredMovies = movies.filter(movie => movie.genres.includes(selectedGenre))
+    }
+    return filteredMovies.slice().sort((a, b) => {
+      const order = ascendingOrder ? 1 : -1
+      return order * (a.year - b.year)
+    })
+  }, [movies, ascendingOrder, selectedGenre])
 
   const handleMovieFetch = () => {
     setLoading(true)
     setFetchCount(fetchCount + 1)
     console.log('Getting movies')
-    fetch('http://localhost:3001/movies?_limit=50')
+    let url = 'http://localhost:3001/movies?_limit=50'
+    if (selectedGenre !== '') {
+      url += `&genres=${selectedGenre}`
+    }
+    fetch(url)
       .then(res => res.json())
       .then(json => {
         setMovies(json)
         setLoading(false)
       })
       .catch(() => {
-        console.log('Run yarn movie-api for fake api')
+        setLoading(false)
       })
+  }
+
+  const handleGenreChange = (event) => {
+    setSelectedGenre(event.target.value)
+    setLoading(true)
+    setFetchCount(fetchCount + 1)
+    console.log('Getting movies')
+    let url = 'http://localhost:3001/movies?_limit=50'
+    if (event.target.value !== '') {
+      url += `&genres_like=${event.target.value}`
+    }
+    fetch(url)
+      .then(res => res.json())
+      .then(json => {
+        setMovies(json)
+        setLoading(false)
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }
+
+  const handleOrderChange = () => {
+    setAscendingOrder(!ascendingOrder)
   }
 
   useEffect(() => {
     handleMovieFetch()
-  }, [handleMovieFetch])
+  }, [])
+
+  useEffect(() => {
+    fetch('http://localhost:3001/genres')
+      .then(res => res.json())
+      .then(json => setGenres(json))
+  }, [])
 
   return (
     <section className="movie-library">
@@ -45,10 +94,15 @@ export default function Exercise02 () {
         Movie Library
       </h1>
       <div className="movie-library__actions">
-        <select name="genre" placeholder="Search by genre...">
-          <option value="genre1">Genre 1</option>
+        <select name="genre" onChange={handleGenreChange} value={selectedGenre}>
+          <option value="">All genres</option>
+          {genres.map(genre => (
+            <option key={genre} value={genre}>{genre}</option>
+          ))}
         </select>
-        <button>Order Descending</button>
+        <button onClick={handleOrderChange}>
+          {ascendingOrder ? 'Year Descending' : 'Year Ascending'}
+        </button>
       </div>
       {loading ? (
         <div className="movie-library__loading">
@@ -57,16 +111,12 @@ export default function Exercise02 () {
         </div>
       ) : (
         <ul className="movie-library__list">
-          {movies.map(movie => (
+          {orderedMovies.map(movie => (
             <li key={movie.id} className="movie-library__card">
-              <img src={movie.posterUrl} alt={movie.title} />
-              <ul>
-                <li>ID: {movie.id}</li>
-                <li>Title: {movie.title}</li>
-                <li>Year: {movie.year}</li>
-                <li>Runtime: {movie.runtime}</li>
-                <li>Genres: {movie.genres.join(', ')}</li>
-              </ul>
+              <li>{movie.title}</li>
+              <li>{movie.genres.join(', ')}</li>
+              <li>{movie.year}</li>
+              <img src={movie.posterUrl} alt={movie.title}  onError={(e) => {e.target.onerror = null; e.target.src=imgMovieNotAvailable;}} />
             </li>
           ))}
         </ul>
